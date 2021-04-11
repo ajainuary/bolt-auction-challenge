@@ -1,0 +1,7 @@
+aiodns==2.0.0
+aiohttp==3.7.3
+aiohttp-jinja2==1.4.2
+aiosqlite==0.16.1
+async-timeout==3.0.1
+Jinja2==2.11.3
+numpy==1.17.4
