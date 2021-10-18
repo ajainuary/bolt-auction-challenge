@@ -39,7 +39,9 @@ async def new_auction(request):
     key = data['key']
     player_ids = await get_player_ids(request.config_dict["DB"], players)
     id = await insert_auction(request.config_dict["DB"], player_ids, key)
-    await broadcast(request.config_dict["DB"], request.config_dict["client"], {"type": "START", "Auction_id": id}, id)
+    loop = asyncio.get_event_loop()
+    loop.create_task(broadcast(request.config_dict["DB"], request.config_dict["client"], {
+                     "type": "START", "Auction_id": id}, id))
     return web.json_response(
         {
             "id": id
@@ -54,7 +56,9 @@ async def submit_bid(request):
     player_id = data['player_id']
     await insert_bid(request.config_dict["DB"], bid_value, auction_id, player_id)
     if await is_open(request.config_dict["DB"], auction_id):
-        await broadcast(request.config_dict["DB"], request.config_dict["client"], {"type": "BID", "Auction_id": auction_id, "bid_value": bid_value, "Player_id": player_id}, auction_id)
+        loop = asyncio.get_event_loop()
+        loop.create_task(broadcast(request.config_dict["DB"], request.config_dict["client"], {
+                         "type": "BID", "Auction_id": auction_id, "bid_value": bid_value, "Player_id": player_id}, auction_id))
     return web.json_response(
         {
             "status": "OK"

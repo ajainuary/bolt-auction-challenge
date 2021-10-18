@@ -7,7 +7,9 @@ from numpy.random import normal
 
 async def send(client, port, msg, delay):
     await asyncio.sleep(delay)
-    await client.post("http://localhost:{}/receive".format(port), json=msg)
+    loop = asyncio.get_event_loop()
+    loop.create_task(client.post(
+        "http://localhost:{}/receive".format(port), json=msg))
 
 
 async def broadcast(db, client, msg, auction_id):
@@ -20,4 +22,6 @@ async def broadcast(db, client, msg, auction_id):
 
 async def complete_auction(request, auction):
     result = await finish_auction(request.config_dict["DB"], auction['id'])
-    await broadcast(request.config_dict["DB"], request.config_dict["client"], {"type": "END", "Auction_id": auction['id'], "Winner": result[0], "Winning_Value": result[1]}, auction['id'])
+    loop = asyncio.get_event_loop()
+    loop.create_task(broadcast(request.config_dict["DB"], request.config_dict["client"], {
+                     "type": "END", "Auction_id": auction['id'], "Winner": result[0], "Winning_Value": result[1]}, auction['id']))
